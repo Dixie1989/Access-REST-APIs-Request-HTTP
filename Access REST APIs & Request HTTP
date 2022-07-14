@@ -1,0 +1,223 @@
+ 
+Estimated time needed: 15 minutes
+Objectives
+After completing this lab you will be able to:
+• Understand HTTP
+• Handle HTTP Requests
+When you, the client, use a web page your browser sends an HTTP request to the server
+where the page is hosted. The server tries to find the desired resource by default 
+"index.html". If your request is successful, the server will send the object to the client in an 
+HTTP response. This includes information like the type of the resource, the length of the 
+resource, and other information.
+The HTTP protocol allows you to send and receive information through the web including 
+webpages, images, and other web resources. In this lab, we will provide an overview of the 
+Requests library for interacting with the HTTP protocol. </p
+Uniform resource locator (URL) is the most popular way to find resources on the web. We 
+can break the URL into three parts.
+You may also hear the term Uniform Resource Identifier (URI), URL are actually a subset of 
+URIs. Another popular term is endpoint, this is the URL of an operation provided by a Web 
+server.
+The process can be broken into the request and response process. The request using the 
+get method is partially illustrated below. In the start line we have the GET method, this is 
+an HTTP method. Also the location of the resource /index.html and the HTTP version. The 
+Request header passes additional information with an HTTP request:
+When an HTTP request is made, an HTTP method is sent, this tells the server what action to
+perform. A list of several HTTP methods is shown below. We will go over more examples 
+later.
+The figure below represents the response; the response start line contains the version 
+number HTTP/1.0, a status code (200) meaning success, followed by a descriptive phrase 
+(OK). The response header contains useful information. Finally, we have the response body 
+containing the requested file, an HTML document. It should be noted that some requests 
+have headers.
+Some status code examples are shown in the table below, the prefix indicates the class. 
+These are shown in yellow, with actual status codes shown in white. Check out the 
+following link for more descriptions.
+Requests is a Python Library that allows you to send HTTP/1.1 requests easily. We can 
+import the library as follows:
+import requests
+We will also use the following libraries:
+import os 
+from PIL import Image
+from IPython.display import IFrame
+You can make a GET request via the method get to www.ibm.com:
+url='https://www.ibm.com/'
+r=requests.get(url)
+We have the response object r, this has information about the request, like the status of the 
+request. We can view the status code using the attribute status_code.
+r.status_code
+200
+You can view the request headers:
+print(r.request.headers)
+{'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, 
+deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Cookie': 
+'_abck=2188268A1B4EA7EE2B43A0982C8A67B8~-1~YAAQq50ZuJh3FbaBAQAAAxpM/
+gjjadmdSP7kfoVF18xVp5cjmsu/MHRfcA1i/
+OoNNTRz8QG2Zg7iA+tcDnLBvKaZ0qTRVNa8OpNekdBe698fMsj8pmHDMkhAUuUcDRKfGzN
+WgwAy+T5oWSleNffOgSQ4Z0/L0WZnc/
+N8nStRPuEatV2LwxrsoyCnYJhYoig1VPe6EpXxOV3NIu+fT20rukRZ8GH14necvCdXRbXX
+ucg8ovOedNFXzfAuBh6oZFRjRQiWIXEIQVT9FJZDaCSusf6QjsBXbsEq/sbPn1cvE/
+na2Cq3ZX+VDPIjZ4/xteJ1s4Afrbb8wsILyF5V7/
+m24vLGcY9uaWYDwCX8qXlCXNtJUSxSRmc=~-1~-1~-1; 
+bm_sz=2D1DD513C84BD32C09D900F4C4B08F32~YAAQq50ZuJl3FbaBAQAAAxpM/hDJHig
+Crrw/acVi+a2fl65yA5DNuXdl9/
+U+iG+wyU8YH5MjW4bdJzETXVk8w9YchDY8ildmBWxZ0H+px8A8JkXGkyF0CRgCviAI5lXY
+Mxbo/STTd+vSWHOsPUl8At5uHeMX9zUfpTqby7x8cI5cgRKyLLf5wAtSn0kp93UdH/
+Gkbb93PHDTCXEZPc/
+OYYjt4A7hxBgjGShM1RtzOMn42yne3C8sS4Y+m96SMwc2OJhStbKQrgHIohrSYUyCo58d1
+S042aelBcR+l2/gFsA=~3748929~3224901'}
+You can view the request body, in the following line, as there is no body for a get request 
+we get a None:
+print("request body:", r.request.body)
+request body: None
+You can view the HTTP response header using the attribute headers. This returns a python 
+dictionary of HTTP response headers.
+header=r.headers
+print(r.headers)
+{'Cache-Control': 'max-age=301', 'Expires': 'Thu, 14 Jul 2022 16:07:02
+GMT', 'Last-Modified': 'Thu, 14 Jul 2022 15:56:12 GMT', 'ETag': 
+'"1717f-5e3c5f0e0fe32"', 'Accept-Ranges': 'bytes', 'Content-Encoding':
+'gzip', 'Content-Type': 'text/html', 'X-Akamai-Transformed': '9 19585 
+0 pmb=mTOE,2', 'Date': 'Thu, 14 Jul 2022 20:00:09 GMT', 'ContentLength': '19749', 'Connection': 'keep-alive', 'Vary': 'AcceptEncoding', 'x-content-type-options': 'nosniff', 'X-XSS-Protection': 
+'1; mode=block', 'Content-Security-Policy': 'upgrade-insecurerequests', 'Strict-Transport-Security': 'max-age=31536000'}
+We can obtain the date the request was sent using the key Date
+header['date']
+'Thu, 14 Jul 2022 20:00:09 GMT'
+Content-Type indicates the type of data:
+header['Content-Type']
+'text/html'
+You can also check the encoding:
+ r.encoding
+'ISO-8859-1'
+As the Content-Type is text/html we can use the attribute text to display the HTML in the 
+body. We can review the first 100 characters:
+r.text[0:100]
+'<!DOCTYPE html><html lang="en-US"><head><meta name="viewport" 
+content="width=device-width"/><meta ch'
+You can load other types of data for non-text requests, like images. Consider the URL of the 
+following image:
+# Use single quotation marks for defining string
+url='https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0101ENSkillsNetwork/IDSNlogo.png'
+We can make a get request:
+r=requests.get(url)
+We can look at the response header:
+print(r.headers)
+{'Date': 'Thu, 14 Jul 2022 20:00:57 GMT', 'X-Clv-Request-Id': 
+'33f60c3f-6313-4105-bc49-0ea434bf354d', 'Server': 'Cleversafe', 'XClv-S3-Version': '2.5', 'Accept-Ranges': 'bytes', 'x-amz-request-id': 
+'33f60c3f-6313-4105-bc49-0ea434bf354d', 'Cache-Control': 'maxage=0,public', 'ETag': '"a831e767d02efd21b904ec485ac0c769"', 'ContentType': 'image/png', 'Last-Modified': 'Thu, 16 Jun 2022 16:00:05 GMT', 
+'Content-Length': '21590'}
+We can see the 'Content-Type'
+r.headers['Content-Type']
+'image/png'
+An image is a response object that contains the image as a bytes-like object. As a result, we 
+must save it using a file object. First, we specify the file path and name
+path=os.path.join(os.getcwd(),'image.png')
+path
+'/resources/labs/image.png'
+We save the file, in order to access the body of the response we use the attribute content 
+then save it using the open function and write method:
+with open(path,'wb') as f:
+ f.write(r.content)
+We can view the image:
+Image.open(path) 
+In the previous section, we used the wget function to retrieve content from the web server 
+as shown below. Write the python code to perform the same task. The code should be the 
+same as the one used to download the image, but the file name should be 'Example1.txt'.
+!wget -O /resources/data/Example1.txt https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0101EN-SkillsNetwork/labs/
+Module%205/data/Example1.txt
+url='https://cf-courses-data.s3.us.cloud-objectstorage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0101ENSkillsNetwork/labs/Module%205/data/Example1.txt'
+path=os.path.join(os.getcwd(),'example1.txt')
+r=requests.get(url)
+with open (path,'wb')as f:
+ f.write(r.content)
+You can use the GET method to modify the results of your query, for example retrieving 
+data from an API. We send a GET request to the server. Like before we have the Base URL, 
+in the Route we append /get, this indicates we would like to preform a GET request. This is 
+demonstrated in the following table:
+The Base URL is for http://httpbin.org/ is a simple HTTP Request & Response Service. The 
+URL in Python is given by:
+url_get='http://httpbin.org/get'
+A query string is a part of a uniform resource locator (URL), this sends other information to
+the web server. The start of the query is a ?, followed by a series of parameter and value 
+pairs, as shown in the table below. The first parameter name is name and the value is 
+Joseph. The second parameter name is ID and the Value is 123. Each pair, parameter, and 
+value is separated by an equals sign, =. The series of pairs is separated by the ampersand &.
+To create a Query string, add a dictionary. The keys are the parameter names and the 
+values are the value of the Query string.
+payload={"name":"Joseph","ID":"123"}
+Then passing the dictionary payload to the params parameter of the get() function:
+r=requests.get(url_get,params=payload)
+We can print out the URL and see the name and values
+r.url
+'http://httpbin.org/get?name=Joseph&ID=123'
+There is no request body
+print("request body:", r.request.body)
+request body: None
+We can print out the status code
+print(r.status_code)
+200
+We can view the response as text:
+print(r.text)
+{
+ "args": {
+ "ID": "123", 
+ "name": "Joseph"
+ }, 
+ "headers": {
+ "Accept": "*/*", 
+ "Accept-Encoding": "gzip, deflate, br", 
+ "Host": "httpbin.org", 
+ "User-Agent": "python-requests/2.28.1", 
+ "X-Amzn-Trace-Id": "Root=1-62d076f6-454ec36a26bad6f47784a5cf"
+ }, 
+ "origin": "169.63.179.135", 
+ "url": "http://httpbin.org/get?name=Joseph&ID=123"
+}
+We can look at the 'Content-Type'.
+r.headers['Content-Type']
+'application/json'
+As the content 'Content-Type' is in the JSON format we can use the method json(), it returns
+a Python dict:
+r.json()
+{'args': {'ID': '123', 'name': 'Joseph'},
+ 'headers': {'Accept': '*/*',
+ 'Accept-Encoding': 'gzip, deflate, br',
+ 'Host': 'httpbin.org',
+ 'User-Agent': 'python-requests/2.28.1',
+ 'X-Amzn-Trace-Id': 'Root=1-62d076f6-454ec36a26bad6f47784a5cf'},
+ 'origin': '169.63.179.135',
+ 'url': 'http://httpbin.org/get?name=Joseph&ID=123'}
+The key args has the name and values:
+r.json()['args']
+{'ID': '123', 'name': 'Joseph'}
+Like a GET request, a POST is used to send data to a server, but the POST request sends the 
+data in a request body. In order to send the Post Request in Python, in the URL we change 
+the route to POST:
+url_post='http://httpbin.org/post'
+This endpoint will expect data as a file or as a form. A form is convenient way to configure 
+an HTTP request to send data to a server.
+To make a POST request we use the post() function, the variable payload is passed to the 
+parameter data :
+r_post=requests.post(url_post,data=payload)
+Comparing the URL from the response object of the GET and POST request we see the POST
+request has no name or value pairs.
+print("POST request URL:",r_post.url )
+print("GET request URL:",r.url)
+POST request URL: http://httpbin.org/post
+GET request URL: http://httpbin.org/get?name=Joseph&ID=123
+We can compare the POST and GET request body, we see only the POST request has a body:
+print("POST request body:",r_post.request.body)
+print("GET request body:",r.request.body)
+POST request body: name=Joseph&ID=123
+GET request body: None
+We can view the form as well:
+r_post.json()['form']
+{'ID': '123', 'name': 'Joseph'}
+There is a lot more you can do. Check out Requests for more.
+Authors
+Other Contributors
+Mavis Zhou
+Change Log
+Date (YYYY-MM-DD)
+2021-12-20
+2020-09-02
+ © IBM Corporation 2020. All rights reserved. 
